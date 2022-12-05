@@ -1,0 +1,29 @@
+---
+export interface Props {
+  name: string;
+  label: string;
+  placeholder?: string;
+  class?: string;
+}
+
+const { name, label, class: className, placeholder } = Astro.props;
+---
+
+<div class:list={["flex flex-col items-start py-2", className]}>
+  <label for={name}>
+    <slot name="label-leading" />
+    {label}
+  </label>
+  <div class="flex w-full gap-1 border-b border-gray-600 py-2">
+    <slot name="leading" />
+    <input
+      id={name}
+      name={name}
+      placeholder={placeholder}
+      class="w-full appearance-none border-none bg-transparent leading-tight text-gray-700 focus:outline-none"
+      type="text"
+      aria-label={label}
+    />
+    <slot name="trailing" />
+  </div>
+</div>
