@@ -1,0 +1,122 @@
+---
+---
+
+<astro-nav class="fixed w-screen z-50">
+  <nav class="container mx-auto bg-transparent">
+    <div class="relative flex h-16 items-center justify-between">
+      <slot name="leading" />
+      <div class="hidden flex-grow gap-4 sm:ml-6 sm:flex">
+        <slot name="links" />
+      </div>
+      <div data-position="trailing" class="flex items-center gap-4">
+        <slot name="trailing" />
+        <div class="flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:hidden sm:pr-0">
+          <!-- Mobile menu button-->
+          <button
+            type="button"
+            class="group inline-flex items-center justify-center rounded-md p-2 text-gray-400 focus:outline-none"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <span class="sr-only">Open main menu</span>
+            <!--
+              Icon when menu is closed.
+              Heroicon name: outline/bars-3
+              Menu open: "hidden", Menu closed: "block"
+            -->
+            <svg
+              class="h-6 w-6 group-aria-expanded:hidden"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+            </svg>
+            <!--
+              Icon when menu is open.
+              Heroicon name: outline/x-mark
+              Menu open: "block", Menu closed: "hidden"
+            -->
+            <svg
+              class="hidden h-6 w-6 group-aria-expanded:block"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8"></div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div
+      class="absolute z-10 hidden h-screen w-screen bg-white bg-opacity-70 backdrop-blur-md"
+      id="mobile-menu"
+    >
+      <div class="relative space-y-1 px-2 pt-2 pb-3">
+        <slot name="mobile-links" />
+      </div>
+    </div>
+  </nav>
+</astro-nav>
+
+<script>
+  class AstroNav extends HTMLElement {
+    menuButton;
+    menu;
+
+    scrollOffset = 35;
+    hasBg = false;
+
+    constructor() {
+      super();
+
+      this.toggleMunu = this.toggleMunu.bind(this);
+      this.handleScroll = this.handleScroll.bind(this);
+
+      this.menu = this.querySelector("#mobile-menu");
+      this.menuButton = this.querySelector('[aria-controls="mobile-menu"]');
+
+      this.menuButton?.addEventListener("click", this.toggleMunu);
+      window.addEventListener("scroll", this.handleScroll);
+    }
+
+    handleScroll() {
+      if (window.scrollY > this.scrollOffset && !this.hasBg) {
+        this.classList.add("bg-white", "shadow-md");
+        this.hasBg = true;
+      } else if (window.scrollY < this.scrollOffset && this.hasBg) {
+        this.classList.remove("bg-white", "shadow-md");
+        this.hasBg = false;
+      }
+    }
+
+    toggleMunu() {
+      this.menu?.classList.toggle("hidden");
+      document.body.classList.toggle("overflow-hidden");
+      if (this.menuButton != null) {
+        if (this.menuButton?.getAttribute("aria-expanded") === "true") {
+          this.menuButton.setAttribute("aria-expanded", "false");
+          this.classList.remove("bg-white", "bg-opacity-70");
+        } else {
+          this.menuButton.setAttribute("aria-expanded", "true");
+          this.classList.add("bg-white", "bg-opacity-70");
+        }
+      }
+    }
+  }
+
+  customElements.define("astro-nav", AstroNav);
+</script>
